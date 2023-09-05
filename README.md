@@ -1,6 +1,6 @@
 # deploy azure resource
 
-to deploy the azure resources use [deploy.ps1](eng\deploy.ps1)
+to deploy the azure resources use [deploy.ps1](https://github.com/nampacx/MeetingNotes/blob/main/eng/deploy.ps1)
 
 ```
 az login
