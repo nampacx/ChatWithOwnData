@@ -3,9 +3,11 @@ So far, this porject uses Azure Storage Account, Azure Functions and Azure OpenA
 Currently the workflow looks like this:
 
 ```mermaid
-graoh TD;
-  A-->B
-  A-->C
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
 ```
 
 
