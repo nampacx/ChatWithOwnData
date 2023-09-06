@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -27,11 +29,13 @@ namespace Company.Function.functions
         private const string EmbeddingModelName = "embedding";
         private readonly OpenAIClient client;
         private readonly SearchIndexClient searchIndexClient;
-        private readonly string indexName = "transcripts";
-        public TranscriptUploadedBlobTrigger(OpenAIClient client, SearchIndexClient searchIndexClient)
+        private readonly IndexBuilder indexBuilder;
+
+        public TranscriptUploadedBlobTrigger(OpenAIClient client, SearchIndexClient searchIndexClient, IndexBuilder indexBuilder)
         {
             this.client = client;
             this.searchIndexClient = searchIndexClient;
+            this.indexBuilder = indexBuilder;
         }
 
 
@@ -42,6 +46,20 @@ namespace Company.Function.functions
 
             var fileContent = StreamToString(myBlob);
             var fileExtension = Path.GetExtension(name);
+
+            var indexName = Path.GetDirectoryName(name);
+
+              if(await indexBuilder.IndexExistsAsync(indexName))
+                {
+                    log.LogInformation($"Index {indexName} already exists");
+                }
+                else
+                {
+                    var index = IndexBuilder.BuildIndex(indexName);
+                    await indexBuilder.CreateIndexAsync(index);
+                    log.LogInformation($"Created index {indexName}");
+                }
+
             List<string> lines = null;
             if (fileExtension == ".txt")
             {
@@ -65,7 +83,7 @@ namespace Company.Function.functions
 
             List<transcript> transcripts = await GetTranscriptsWithEmbedding(name, chunks, log);
             log.LogInformation($"Created {transcripts.Count} transcripts");
-            UpdateIndex(log, transcripts);
+            await UpdateIndexAsync(indexName, log, transcripts);
 
             log.LogInformation("Trigger finished!");
         }
@@ -103,13 +121,15 @@ namespace Company.Function.functions
             }).ToList();
         }
 
-        private void UpdateIndex(ILogger log, List<transcript> transcripts)
+        private async Task UpdateIndexAsync(string indexName, ILogger log, List<transcript> transcripts)
         {
             var batch = IndexDocumentsBatch.Create(transcripts.Select(t => IndexDocumentsAction.Upload(t)).ToArray());
             try
             {
+              
+
                 var searchClient = searchIndexClient.GetSearchClient(indexName);
-                var result = searchClient.IndexDocuments(batch);
+                var result = await searchClient.IndexDocumentsAsync(batch);
 
                 if (!result.Value.Results.All(r => r.Succeeded))
                 {
@@ -144,7 +164,6 @@ namespace Company.Function.functions
                 {
                     content = chunks[i],
                     content_vector = embeddings.ToList(),
-                    speaker = chunks[i].Split(":")[0],
                     origin = id,
                     id = $"f-{id}-{i}"
                 };
@@ -167,13 +186,15 @@ namespace Company.Function.functions
 
         class transcript
         {
+            [SearchableField(IsKey = true)]
             public string id { get; set; }
+
+
             public string content { get; set; }
             public List<float> content_vector { get; set; }
 
             public string origin { get; set; }
 
-            public string speaker { get; set; }
         }
     }
 }

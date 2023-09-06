@@ -30,10 +30,19 @@ namespace Company.Function
             builder.Services.AddSingleton(p =>
           {
               // Get the service endpoint and API key from the environment
-              Uri endpoint = new Uri(_config.GetValue<string>("AZURE_SEARCH_ENDPOINT"));
-              string key = _config.GetValue<string>("AZURE_SEARCH_KEY");
+              var endpoint = new Uri(_config.GetValue<string>("AZURE_SEARCH_ENDPOINT"));
+              var key = _config.GetValue<string>("AZURE_SEARCH_KEY");
 
               return new SearchIndexClient(endpoint, new AzureKeyCredential(key));
+          });
+
+              builder.Services.AddSingleton(p =>
+          {
+              // Get the service endpoint and API key from the environment
+              var endpoint =_config.GetValue<string>("AZURE_SEARCH_ENDPOINT");
+              var key = _config.GetValue<string>("AZURE_SEARCH_KEY");
+
+              return new IndexBuilder(endpoint, key);
           });
         }
 
