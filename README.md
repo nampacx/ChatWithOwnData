@@ -1,3 +1,14 @@
+So far, this porject uses Azure Storage Account, Azure Functions and Azure OpenAI to put trnascript data in an Azure Cognitve Search Service.
+
+Currently the workflow looks like this:
+
+```mermaid
+graoh TD;
+  A-->B
+  A-->C
+```
+
+
 # deploy azure resource
 
 to deploy the azure resources use [deploy.ps1](https://github.com/nampacx/MeetingNotes/blob/main/eng/deploy.ps1)
