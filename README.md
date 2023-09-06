@@ -4,10 +4,10 @@ Currently the workflow looks like this:
 
 ```mermaid
 graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
+    A|Storage Account|-->|Blob trigger| B|TranscriptUploadedBlobTrigger|
+    B-->|Extract index name (= blob file directory name)| C{Check if index exists}
+    C-->|Yes| D
+    C-->|No| E|Create new search index|
 ```
 
 
