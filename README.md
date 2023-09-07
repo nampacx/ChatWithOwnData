@@ -1,5 +1,6 @@
-So far, this porject uses Azure Storage Account, Azure Functions and Azure OpenAI to put trnascript data in an Azure Cognitve Search Service.
+So far, this project uses Azure Storage Account, Azure Functions and Azure OpenAI to put transcript data in an Azure cognitive Search Service.
 
+Whats right now missing in this repository is the prompt flow which is brings together azure search and azure openai. This will later be added. The promptflow endpoint deployment will than provide the "ML"-settings.
 
 # deploy azure resource
 
@@ -11,25 +12,30 @@ az account set --s subscriptionId
 .\deploy.ps1
 ```
 
-
 # To run local
 
 Get the necessary data from the azure resources and add them to the either local.setting.json or into local project secrets.
 
 ## Project secrets
-recommended using secrets:  [.net secrets extension](https://marketplace.visualstudio.com/items?itemName=adrianwilczynski.user-secrets)
+
+recommended using secrets: [.net secrets extension](https://marketplace.visualstudio.com/items?itemName=adrianwilczynski.user-secrets)
 and the following secrets
+
 ```
 {
     "AzureWebJobsStorage": "<Storage account connection string>",
     "AZURE_SEARCH_ENDPOINT":"<azure search endpoint>",
     "AZURE_SEARCH_KEY":"<azure search key>",
     "OPENAI_KEY":"<open ai key>",
-    "OPENAI_ENDPOINT":"<open ai endpoint>"
+    "OPENAI_ENDPOINT":"<open ai endpoint>",
+    "ML_MODEL_NAME": "<Azure ML model>",
+    "ML_AUTHORIZATION_KEY": "<model endpoint key>",
+    "ML_ENDPOINT": "<model endpoint>"
 }
 ```
 
 ## Local setting
+
 ```
 {
   "IsEncrypted": false,
@@ -39,10 +45,10 @@ and the following secrets
     "AZURE_SEARCH_ENDPOINT":"<azure search endpoint>",
     "AZURE_SEARCH_KEY":"<azure search key>",
     "OPENAI_KEY":"<open ai key>",
-    "OPENAI_ENDPOINT":"<open ai endpoint>"
+    "OPENAI_ENDPOINT":"<open ai endpoint>",
+    "ML_MODEL_NAME": "<Azure ML model>",
+    "ML_AUTHORIZATION_KEY": "<model endpoint key>",
+    "ML_ENDPOINT": "<model endpoint>"
   }
 }
 ```
-
-
-
