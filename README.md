@@ -1,15 +1,5 @@
 So far, this porject uses Azure Storage Account, Azure Functions and Azure OpenAI to put trnascript data in an Azure Cognitve Search Service.
 
-Currently the workflow looks like this:
-
-```mermaid
-graph TD;
-    A|Storage Account|-->|Blob trigger| B|TranscriptUploadedBlobTrigger|
-    B-->|Extract index name| C{Check if index exists}
-    C-->|Yes| D
-    C-->|No| E|Create new search index|
-```
-
 
 # deploy azure resource
 
