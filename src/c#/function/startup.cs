@@ -36,14 +36,19 @@ namespace Company.Function
               return new SearchIndexClient(endpoint, new AzureKeyCredential(key));
           });
 
-              builder.Services.AddSingleton(p =>
-          {
-              // Get the service endpoint and API key from the environment
-              var endpoint =_config.GetValue<string>("AZURE_SEARCH_ENDPOINT");
-              var key = _config.GetValue<string>("AZURE_SEARCH_KEY");
+            builder.Services.AddSingleton(p =>
+            {
+                return new MLAccess(_config.GetValue<string>("ML_MODEL_NAME"), _config.GetValue<string>("ML_AUTHORIZATION_KEY"), _config.GetValue<string>("ML_ENDPOINT"));
+            });
 
-              return new IndexBuilder(endpoint, key);
-          });
+            builder.Services.AddSingleton(p =>
+        {
+            // Get the service endpoint and API key from the environment
+            var endpoint = _config.GetValue<string>("AZURE_SEARCH_ENDPOINT");
+            var key = _config.GetValue<string>("AZURE_SEARCH_KEY");
+
+            return new IndexBuilder(endpoint, key);
+        });
         }
 
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

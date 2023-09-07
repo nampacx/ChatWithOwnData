@@ -126,8 +126,6 @@ namespace Company.Function.functions
             var batch = IndexDocumentsBatch.Create(transcripts.Select(t => IndexDocumentsAction.Upload(t)).ToArray());
             try
             {
-              
-
                 var searchClient = searchIndexClient.GetSearchClient(indexName);
                 var result = await searchClient.IndexDocumentsAsync(batch);
 
@@ -188,7 +186,6 @@ namespace Company.Function.functions
         {
             [SearchableField(IsKey = true)]
             public string id { get; set; }
-
 
             public string content { get; set; }
             public List<float> content_vector { get; set; }
