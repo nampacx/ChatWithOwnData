@@ -32,9 +32,10 @@ namespace Company.Function.functions
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             var question = data?.question;
-            var indexName = data?.index_name; 
+            var index_name = data?.index_name; 
+            var chat_history  = data?.chat_history;
 
-            var body = JsonConvert.SerializeObject(new { question, chat_history = new string[0], index_name = indexName });
+            var body = JsonConvert.SerializeObject(new { question, chat_history, index_name});
 
             var response = JsonConvert.DeserializeObject<mlResponse>( await mlAccess.GetResponseAsync(body));
 

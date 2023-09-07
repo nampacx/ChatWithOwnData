@@ -3,10 +3,18 @@ import lens from "./assets/lens.png";
 import loadingGif from "./assets/loading.gif";
 import "./App.css";
 
+class Dialog {
+  constructor(inputs, outputs) {
+    this.inputs = inputs;
+    this.outputs = outputs;
+  }
+}
+
 function App() {
   const [prompt, updatePrompt] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState(undefined);
+  const [chatHistory, setChatHistory] = useState([]);
 
   useEffect(() => {
     if (prompt != null && prompt.trim() === "") {
@@ -26,7 +34,8 @@ function App() {
 
       var raw = JSON.stringify({
         "question": prompt,
-        "index_name": "architectcommunity"
+        "index_name": "architectcommunity",
+        "chat_history": chatHistory
       });
 
       var requestOptions = {
@@ -44,7 +53,15 @@ function App() {
 
       const { answer } = await res.json();
       console.log(answer);
+
+      var dialog = {
+        "inputs": {"question": prompt},
+        "outputs": {"answer": answer}
+      };
+
       setAnswer(answer);
+      setChatHistory([...chatHistory, dialog]);
+      console.log(chatHistory);
     } catch (err) {
       console.error(err, "err");
     } finally {
