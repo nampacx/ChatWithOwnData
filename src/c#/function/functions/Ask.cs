@@ -7,6 +7,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Company.Function
 {
@@ -35,9 +37,11 @@ namespace Company.Function
 
             var embeddings = await llmAccess.GetEmbeddingsAsync(question);
 
-            var response = await searchService.SearchAsync(embeddings, 1, index_name);
+            List<SearchResult> searchResults = await searchService.SearchAsync(embeddings, 1, index_name);
+            var pastMeetingsTranscripts = searchResults.Select(r => $"Meeting tile: {r.origin}{Environment.NewLine}{r.content}").ToList();
+            var answer = await llmAccess.ExecutePromptAsync(pastMeetingsTranscripts, question);
 
-            return new OkObjectResult(response);
+            return new OkObjectResult(new {question, answer});
         }
 
         class Request{

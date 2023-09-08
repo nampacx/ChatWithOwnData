@@ -1,6 +1,6 @@
-So far, this project uses Azure Storage Account, Azure Functions and Azure OpenAI to put transcript data in an Azure cognitive Search Service.
+This is a sample project to show case how to use Azure OpenAI and Azure Search to Search your own data.
 
-Whats right now missing in this repository is the prompt flow which is brings together azure search and azure openai. This will later be added. The promptflow endpoint deployment will than provide the "ML"-settings.
+
 
 # deploy azure resource
 
@@ -30,7 +30,9 @@ and the following secrets
     "OPENAI_ENDPOINT":"<open ai endpoint>",
     "ML_MODEL_NAME": "<Azure ML model>",
     "ML_AUTHORIZATION_KEY": "<model endpoint key>",
-    "ML_ENDPOINT": "<model endpoint>"
+    "ML_ENDPOINT": "<model endpoint>",
+    "EMBEDDING_MODEL_NAME": "embedding" ,
+    "CHAT_MODEL_NAME": "chat" 
 }
 ```
 
@@ -48,7 +50,9 @@ and the following secrets
     "OPENAI_ENDPOINT":"<open ai endpoint>",
     "ML_MODEL_NAME": "<Azure ML model>",
     "ML_AUTHORIZATION_KEY": "<model endpoint key>",
-    "ML_ENDPOINT": "<model endpoint>"
+    "ML_ENDPOINT": "<model endpoint>",
+    "EMBEDDING_MODEL_NAME": "embedding",
+    "CHAT_MODEL_NAME": "chat" 
   }
 }
 ```

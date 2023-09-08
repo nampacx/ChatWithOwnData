@@ -4,9 +4,13 @@ using Azure;
 using Azure.AI.OpenAI;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
+using Azure.Storage.Blobs;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using RestSharp;
 
 
 [assembly: FunctionsStartup(typeof(Company.Function.Startup))]
@@ -23,11 +27,12 @@ namespace Company.Function
             builder.Services.AddSingleton(p =>
                     {
                         var embeddingModelName = _config.GetValue<string>("EMBEDDING_MODEL_NAME");
+                        var chatModelName = _config.GetValue<string>("CHAT_MODEL_NAME");
                         var aoaiEndpoint = new Uri(_config.GetValue<string>("OPENAI_ENDPOINT"));
                         var aoaiCredentials = new AzureKeyCredential(_config.GetValue<string>("OPENAI_KEY"));
                         var openAIClient = new OpenAIClient(aoaiEndpoint, aoaiCredentials);
 
-                        return new LLMAccess(openAIClient, embeddingModelName);
+                        return new LLMAccess(openAIClient, embeddingModelName, chatModelName);
                     });
 
             builder.Services.AddSingleton(p =>
@@ -38,6 +43,17 @@ namespace Company.Function
 
               return new SearchIndexClient(endpoint, new AzureKeyCredential(key));
           });
+
+            builder.Services.AddSingleton(p =>
+       {
+           // Get the service endpoint and API key from the environment
+           var storageAccountConnectionString = _config.GetValue<string>("AzureWebJobsStorage");
+           var containerName = _config.GetValue<string>("TRANSCRIPT_CONTAINER");
+           var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
+           var blobClient = storageAccount.CreateCloudBlobClient();
+           var container = blobClient.GetContainerReference(containerName);
+           return container;
+       });
 
             builder.Services.AddSingleton(p =>
             {
