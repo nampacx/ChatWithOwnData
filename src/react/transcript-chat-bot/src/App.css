@@ -21,6 +21,30 @@
   max-width: 600px;
   background-color: #fff;
 }
+.tab{
+  height: 90vh;
+}
+
+.chat { 
+  height: 50vh;
+  border-radius: 12px;
+  border: 1px solid #dfe1e5;
+  margin: auto;
+  max-width: 600px;
+  background-color: darkgrey;
+  overflow: auto;
+  overflow-x: hidden;
+  flex-direction: column-reverse;
+}
+
+.chat_bubble{
+  margin: 5px;
+  border-radius: 12px;
+  border: 1px solid #dfe1e5;;
+  width: auto;
+  max-width: 600px;
+  background-color: #fff;
+}
 
 .spotlight__wrapper:hover,
 .spotlight__wrapper:focus {
@@ -75,4 +99,27 @@
   0% {
     opacity: 0;
   }
+}
+
+.user_msg{
+  margin: 5px;
+  border-radius: 12px;
+  width: auto;
+  max-width: 600px;
+  background-color: #fff;
+  text-align: right;
+  margin-left: 30%;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.sys_msg{
+  margin: 5px;
+  border-radius: 12px;
+  width: auto;
+  max-width: 600px;
+  background-color: lightblue;
+  margin-right: 30%;
+  display: flex;
+  flex-direction: row-reverse;
 }

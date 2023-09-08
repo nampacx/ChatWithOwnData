@@ -33,13 +33,23 @@ public class LLMAccess
 
     public async Task<string> ExecutePromptAsync(
         List<string> pastMeetingTranscripts,
-        string question
+        string question,
+        List<AskChatMessage> chatHistory
     )
     {
         var sb = new StringBuilder();
         sb.AppendLine(SystemDescription);
         sb.AppendLine("Past meeting transcripts:");
         sb.AppendLine(string.Join(Environment.NewLine, pastMeetingTranscripts));
+
+        if (chatHistory != null)
+        {
+            sb.AppendLine("Chat history:");
+            foreach (var chatMessage in chatHistory)
+            {
+                sb.AppendLine($"{chatMessage.role}: {chatMessage.content}");
+            }
+        }
 
         var messages = new List<ChatMessage>()
         {
@@ -50,7 +60,7 @@ public class LLMAccess
         var options = new ChatCompletionsOptions(messages)
         {
             MaxTokens = 1816,
-            Temperature = 0.5f,
+            Temperature = 0f,
             FrequencyPenalty = 0.0f,
             PresencePenalty = 0.0f,
         };

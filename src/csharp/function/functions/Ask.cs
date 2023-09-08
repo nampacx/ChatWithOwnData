@@ -32,9 +32,10 @@ namespace Company.Function
             log.LogInformation("csharp HTTP trigger function processed a request.");
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject<Request>(requestBody);
+            dynamic data = JsonConvert.DeserializeObject<AskRequest>(requestBody);
             var question = data.question;
             var index_name = data.index_name;
+            var chat_history = data.chat_history;
 
             var embeddings = await llmAccess.GetEmbeddingsAsync(question);
 
@@ -46,16 +47,12 @@ namespace Company.Function
             var pastMeetingsTranscripts = searchResults
                 .Select(r => $"Meeting tile: {r.origin}{Environment.NewLine}{r.content}")
                 .ToList();
-            var answer = await llmAccess.ExecutePromptAsync(pastMeetingsTranscripts, question);
+            var answer = await llmAccess.ExecutePromptAsync(pastMeetingsTranscripts, question, chat_history);
             var response = new { question, answer };
             log.LogInformation($"Response: {JsonConvert.SerializeObject(response)}");
             return new OkObjectResult(response);
         }
 
-        class Request
-        {
-            public string question { get; set; }
-            public string index_name { get; set; }
-        }
+    
     }
 }
