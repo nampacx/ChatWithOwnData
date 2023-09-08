@@ -47,8 +47,9 @@ namespace Company.Function
                 .Select(r => $"Meeting tile: {r.origin}{Environment.NewLine}{r.content}")
                 .ToList();
             var answer = await llmAccess.ExecutePromptAsync(pastMeetingsTranscripts, question);
-
-            return new OkObjectResult(new { question, answer });
+            var response = new { question, answer };
+            log.LogInformation($"Response: {JsonConvert.SerializeObject(response)}");
+            return new OkObjectResult(response);
         }
 
         class Request

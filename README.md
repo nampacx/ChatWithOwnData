@@ -1,6 +1,8 @@
 This is a sample project to show case how to use Azure OpenAI and Azure Search to Search your own data.
 
-This project contains a bunch of azure functions.
+
+# Azure Functions 
+
 
 ### [TranscriptUploadedBlobTrigger](/src/csharp/function/functions/TranscriptUploadedBlobTrigger.cs)
 This function is triggered by an blob upload. It chunks down the document and lets Azure OpenAI create 
@@ -11,6 +13,13 @@ Extracts a file and a directory name from a post request with form-data and stor
 
 ### [Ask](/src/csharp/function/functions/Ask.cs)
 As the name says, Ask endpoint. If requires an index name and a question. It will than use Azure OpenAI to get an embedding vector and use this to query data from Azure Search. At the end it will than use Azure OpenAI again to phrase an answer.
+
+# React Frontend
+Besides the Azure function the project contains also a simple ui to ask questions.
+
+![simple ui](image-1.png)
+
+Chat history is right now not supported. May be added later.
 
 # deploy azure resource
 
@@ -65,4 +74,13 @@ and the following secrets
     "CHAT_MODEL_NAME": "chat" 
   }
 }
+```
+
+
+# Start front end
+Go to /src/react/transcript-chat-bot
+
+```
+npm install
+npm run dev
 ```

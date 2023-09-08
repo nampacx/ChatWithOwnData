@@ -35,7 +35,7 @@ function App() {
       var raw = JSON.stringify({
         "question": prompt,
         "index_name": "architectcommunity",
-        "chat_history": chatHistory
+        // "chat_history": chatHistory
       });
 
       var requestOptions = {
@@ -45,7 +45,7 @@ function App() {
         redirect: 'follow'
       };
 
-      const res = await fetch("http://localhost:7071/api/mlproxy", requestOptions);
+      const res = await fetch("http://localhost:7071/api/ask", requestOptions);
       console.log(res, "res");
       if (!res.ok) {
         throw new Error("Something went wrong");
@@ -60,7 +60,7 @@ function App() {
       };
 
       setAnswer(answer);
-      setChatHistory([...chatHistory, dialog]);
+      // setChatHistory([...chatHistory, dialog]);
       console.log(chatHistory);
     } catch (err) {
       console.error(err, "err");
