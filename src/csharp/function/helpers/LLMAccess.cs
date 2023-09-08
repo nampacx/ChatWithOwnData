@@ -9,8 +9,9 @@ using Microsoft.Identity.Client;
 
 public class LLMAccess
 {
-    private const string SystemDescription =
-        "You are an AI meeting minutes assistant that helps people find information in past meeting transcripts shared with you below. When answering questions try to mention the person who said what you are referring to as well as the meeting it was said in.";
+     private const string SystemDescription =
+         "You are an AI meeting minutes assistant that helps people find information in past meeting transcripts shared with you below. When answering questions try to mention the person who said what you are referring to as well as the meeting it was said in.";
+
 
     private readonly OpenAIClient client;
     private readonly string embeddingModelName;

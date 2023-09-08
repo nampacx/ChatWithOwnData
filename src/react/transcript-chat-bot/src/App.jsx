@@ -10,15 +10,10 @@ function App() {
 
 
   useEffect(() => {
-    if (prompt != null && prompt.trim() === "") {
-      setAnswer(undefined);
-    }
-  }, [prompt]);
-
-  useEffect(() => {
+    if(chatHistory.length > 0) {
     var chatElement = document.getElementById("chat");
     chatElement.scrollTop = chatElement.scrollHeight;
-  }, [chatHistory]);
+  }}, [chatHistory]);
 
   const sendPrompt = async (event) => {
     if (event.key !== "Enter") {
@@ -67,7 +62,7 @@ function App() {
     <div className="app">
       <div className="app-container">
 
-            <div className="chat" id="chat">
+            <div className="chat" id="chat" >
               <section>
                 {chatHistory && chatHistory.length
                   ? chatHistory.map((chat, index) => (

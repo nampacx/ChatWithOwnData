@@ -17,9 +17,9 @@ As the name says, Ask endpoint. If requires an index name and a question. It wil
 # React Frontend
 Besides the Azure function the project contains also a simple ui to ask questions.
 
-![simple ui](image-1.png)
+![Alt text](image-2.png)
 
-Chat history is right now not supported. May be added later.
+Chat history is now also implemented.
 
 # deploy azure resource
 
