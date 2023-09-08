@@ -20,22 +20,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Company.Function.functions
 {
-
-
     public class TranscriptUploadedBlobTrigger
     {
-
         private const int MaxChunkSize = 3;
-        private const string EmbeddingModelName = "embedding";
-        private readonly OpenAIClient client;
-        private readonly SearchIndexClient searchIndexClient;
         private readonly IndexBuilder indexBuilder;
+        private readonly SearchService searchService;
+        private readonly LLMAccess llmAccess;
 
-        public TranscriptUploadedBlobTrigger(OpenAIClient client, SearchIndexClient searchIndexClient, IndexBuilder indexBuilder)
+        public TranscriptUploadedBlobTrigger(IndexBuilder indexBuilder, SearchService searchService, LLMAccess llmAccess)
         {
-            this.client = client;
-            this.searchIndexClient = searchIndexClient;
             this.indexBuilder = indexBuilder;
+            this.searchService = searchService;
+            this.llmAccess = llmAccess;
         }
 
 
@@ -44,7 +40,7 @@ namespace Company.Function.functions
         {
             log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
 
-            var fileContent = StreamToString(myBlob);
+            var fileContent = myBlob.StreamToString();
             var fileExtension = Path.GetExtension(name);
 
             var indexName = Path.GetDirectoryName(name);
@@ -63,12 +59,12 @@ namespace Company.Function.functions
             List<string> lines = null;
             if (fileExtension == ".txt")
             {
-                lines = ParseTXT(fileContent);
+                lines =fileContent.ParseTXT();
                 log.LogInformation($"Parsed {lines.Count} lines from TXT file");
             }
             else if (fileExtension == ".vtt")
             {
-                lines = ParseVTT(fileContent);
+                lines =fileContent.ParseVTT();
                 log.LogInformation($"Parsed {lines.Count} lines from VTT file");
             }
             else
@@ -81,9 +77,9 @@ namespace Company.Function.functions
 
             log.LogInformation($"Created {chunks.Count} chunks");
 
-            List<transcript> transcripts = await GetTranscriptsWithEmbedding(name, chunks, log);
+            List<Transcript> transcripts = await GetTranscriptsWithEmbedding(name, chunks, log);
             log.LogInformation($"Created {transcripts.Count} transcripts");
-            await UpdateIndexAsync(indexName, log, transcripts);
+            await searchService.UpdateIndexAsync(indexName, log, transcripts);
 
             log.LogInformation("Trigger finished!");
         }
@@ -99,66 +95,16 @@ namespace Company.Function.functions
             return chunks;
         }
 
-        private static string GetID(string name)
+    
+        private async Task<List<Transcript>> GetTranscriptsWithEmbedding(string name, List<string> chunks, ILogger log = null)
         {
-            var pattern = "[^a-zA-Z0-9]+";
-            var replacement = "";
-            var output = Regex.Replace(Path.GetFileNameWithoutExtension(name), pattern, replacement);
-            return output;
-        }
-
-        private static List<string> ParseTXT(string fileContent)
-        {
-            return fileContent.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
-        }
-
-        private static List<string> ParseVTT(string fileContent)
-        {
-            return fileContent.Split(new[] { $"{Environment.NewLine}{Environment.NewLine}" }, StringSplitOptions.RemoveEmptyEntries).Select(f =>
-            {
-                var lines = f.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Where(l => !l.Contains("-->")).Select(l => l.Replace("<v ", "").Replace("</v>", "").Replace(">", ": ")).ToList();
-                return string.Join(Environment.NewLine, lines);
-            }).ToList();
-        }
-
-        private async Task UpdateIndexAsync(string indexName, ILogger log, List<transcript> transcripts)
-        {
-            var batch = IndexDocumentsBatch.Create(transcripts.Select(t => IndexDocumentsAction.Upload(t)).ToArray());
-            try
-            {
-                var searchClient = searchIndexClient.GetSearchClient(indexName);
-                var result = await searchClient.IndexDocumentsAsync(batch);
-
-                if (!result.Value.Results.All(r => r.Succeeded))
-                {
-                    log.LogError($"Failed to index some of the documents: {string.Join(", ", result.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key))}");
-                }
-                else
-                {
-                    log.LogInformation($"Indexed {transcripts.Count} documents");
-                }
-            }
-            catch (Exception e)
-            {
-                // Sometimes when your Search service is under load, indexing will fail for some of the documents in
-                // the batch. Depending on your application, you can take compensating actions like delaying and
-                // retrying. For this simple demo, we just log the failed document keys and continue.
-                log.LogCritical($"{e.Message}");
-            }
-        }
-
-        private async Task<List<transcript>> GetTranscriptsWithEmbedding(string name, List<string> chunks, ILogger log = null)
-        {
-            var transcripts = new List<transcript>();
-            var id = GetID(name);
+            var transcripts = new List<Transcript>();
+            var id =name.RemoveSpecialCharacters();
             for (var i = 0; i < chunks.Count; i++)
             {
-                var opntions = new EmbeddingsOptions(chunks[i]);
+                var embeddings = await llmAccess.GetEmbeddingsAsync(chunks[i]);
 
-                var result = await client.GetEmbeddingsAsync(EmbeddingModelName, opntions);
-                var embeddings = result.Value.Data[0].Embedding;
-
-                var transcript = new transcript()
+                var transcript = new Transcript()
                 {
                     content = chunks[i],
                     content_vector = embeddings.ToList(),
@@ -171,27 +117,6 @@ namespace Company.Function.functions
             }
 
             return transcripts;
-        }
-
-        public static string StreamToString(Stream stream)
-        {
-            stream.Position = 0;
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                return reader.ReadToEnd();
-            }
-        }
-
-        class transcript
-        {
-            [SearchableField(IsKey = true)]
-            public string id { get; set; }
-
-            public string content { get; set; }
-            public List<float> content_vector { get; set; }
-
-            public string origin { get; set; }
-
-        }
+        }      
     }
 }
