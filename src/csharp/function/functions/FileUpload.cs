@@ -25,7 +25,7 @@ namespace Company.Function
             ILogger log
         )
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("csharp HTTP trigger function processed a request.");
 
             //Read form data.
             var formData = await req.ReadFormAsync();

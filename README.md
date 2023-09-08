@@ -2,7 +2,7 @@ This is a sample project to show case how to use Azure OpenAI and Azure Search t
 
 This project contains a bunch of azure functions.
 
-### [TranscriptUploadedBlobTrigger](/src/c#/function/functions/TranscriptUploadedBlobTrigger.cs)
+### [TranscriptUploadedBlobTrigger](/src/csharp/function/functions/TranscriptUploadedBlobTrigger.cs)
 This function is triggered by an blob upload. It chunks down the document and lets Azure OpenAI create 
 embedding vectors for each chunk. Those are than written in an Azure Search Index. The index in which the data gets stored is determined by the files directory.
 

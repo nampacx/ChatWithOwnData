@@ -46,7 +46,7 @@ namespace Company.Function.functions
         )
         {
             log.LogInformation(
-                $"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes"
+                $"csharp Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes"
             );
 
             var fileContent = myBlob.StreamToString();
