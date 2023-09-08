@@ -9,7 +9,8 @@ using Microsoft.Identity.Client;
 
 public class LLMAccess
 {
-    private const string SystemDescription = "You are an AI meeting minutes assistant that helps people find information in past meeting transcripts shared with you below. When answering questions try to mention the person who said what you are referring to as well as the meeting it was said in.";
+    private const string SystemDescription =
+        "You are an AI meeting minutes assistant that helps people find information in past meeting transcripts shared with you below. When answering questions try to mention the person who said what you are referring to as well as the meeting it was said in.";
 
     private readonly OpenAIClient client;
     private readonly string embeddingModelName;
@@ -30,16 +31,22 @@ public class LLMAccess
         return result.Value.Data[0].Embedding;
     }
 
-    public async Task<string> ExecutePromptAsync(List<string> pastMeetingTranscripts, string question)
+    public async Task<string> ExecutePromptAsync(
+        List<string> pastMeetingTranscripts,
+        string question
+    )
     {
-
         var sb = new StringBuilder();
         sb.AppendLine(SystemDescription);
         sb.AppendLine("Past meeting transcripts:");
         sb.AppendLine(string.Join(Environment.NewLine, pastMeetingTranscripts));
 
-        var messages = new List<ChatMessage>(){new ChatMessage("system",sb.ToString()), new ChatMessage("user", question)};
-    
+        var messages = new List<ChatMessage>()
+        {
+            new ChatMessage("system", sb.ToString()),
+            new ChatMessage("user", question)
+        };
+
         var options = new ChatCompletionsOptions(messages)
         {
             MaxTokens = 1816,

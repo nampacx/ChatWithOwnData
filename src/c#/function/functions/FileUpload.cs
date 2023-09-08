@@ -22,7 +22,8 @@ namespace Company.Function
         [FunctionName("FileUpload")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            ILogger log)
+            ILogger log
+        )
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 

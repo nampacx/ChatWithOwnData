@@ -1,10 +1,20 @@
 This is a sample project to show case how to use Azure OpenAI and Azure Search to Search your own data.
 
+This project contains a bunch of azure functions.
 
+### [TranscriptUploadedBlobTrigger](/src/c#/function/functions/TranscriptUploadedBlobTrigger.cs)
+This function is triggered by an blob upload. It chunks down the document and lets Azure OpenAI create 
+embedding vectors for each chunk. Those are than written in an Azure Search Index. The index in which the data gets stored is determined by the files directory.
+
+### FileUpload
+Extracts a file and a directory name from a post request with form-data and stores the file on a storage account within the directory. 
+
+### Ask
+As the name says, Ask endpoint. If requires an index name and a question. It will than use Azure OpenAI to get an embedding vector and use this to query data from Azure Search. At the end it will than use Azure OpenAI again to phrase an answer.
 
 # deploy azure resource
 
-to deploy the azure resources use [deploy.ps1](https://github.com/nampacx/MeetingNotes/blob/main/eng/deploy.ps1)
+to deploy the azure resources use [deploy.ps1](/eng/deploy.ps1)
 
 ```
 az login

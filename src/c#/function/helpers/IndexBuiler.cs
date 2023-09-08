@@ -22,30 +22,58 @@ public class IndexBuilder
         var transcript = new TranscriptIndex()
         {
             name = name,
-            similarity = new Similarity()
-            {
-                odatatype = "#Microsoft.Azure.Search.BM25Similarity"
-            },
+            similarity = new Similarity() { odatatype = "#Microsoft.Azure.Search.BM25Similarity" },
             vectorSearch = new VectorSearch()
             {
-                algorithmConfigurations = new List<AlgorithmConfiguration>(){
-                        new AlgorithmConfiguration(){
-                            name = "vectorconfig",
-                            kind = "hnsw",
-                            hnswParameters = new HnswParameters(){
-                                metric = "cosine",
-                                m = 4,
-                                efConstruction = 400,
-                                efSearch = 500
-                            }
+                algorithmConfigurations = new List<AlgorithmConfiguration>()
+                {
+                    new AlgorithmConfiguration()
+                    {
+                        name = "vectorconfig",
+                        kind = "hnsw",
+                        hnswParameters = new HnswParameters()
+                        {
+                            metric = "cosine",
+                            m = 4,
+                            efConstruction = 400,
+                            efSearch = 500
                         }
                     }
+                }
             },
-            fields = new List<Field>(){
-                    new Field(){name="id", type="Edm.String", key=true, searchable=true, retrievable=true},
-                    new Field{name="content_vector", type="Collection(Edm.Single)", searchable=true,  retrievable=true,  vectorSearchConfiguration="vectorconfig", dimensions=1536},
-                    new Field{name="origin", type="Edm.String", searchable=true,  retrievable=true},
-                    new Field{name="content", type="Edm.String", searchable=true,  retrievable=true}
+            fields = new List<Field>()
+            {
+                new Field()
+                {
+                    name = "id",
+                    type = "Edm.String",
+                    key = true,
+                    searchable = true,
+                    retrievable = true
+                },
+                new Field
+                {
+                    name = "content_vector",
+                    type = "Collection(Edm.Single)",
+                    searchable = true,
+                    retrievable = true,
+                    vectorSearchConfiguration = "vectorconfig",
+                    dimensions = 1536
+                },
+                new Field
+                {
+                    name = "origin",
+                    type = "Edm.String",
+                    searchable = true,
+                    retrievable = true
+                },
+                new Field
+                {
+                    name = "content",
+                    type = "Edm.String",
+                    searchable = true,
+                    retrievable = true
+                }
             }
         };
 

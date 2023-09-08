@@ -10,16 +10,27 @@ static class ExtensionMethods
 {
     public static List<string> ParseTXT(this string fileContent)
     {
-        return fileContent.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        return fileContent
+            .Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+            .ToList();
     }
 
     public static List<string> ParseVTT(this string fileContent)
     {
-        return fileContent.Split(new[] { $"{Environment.NewLine}{Environment.NewLine}" }, StringSplitOptions.RemoveEmptyEntries).Select(f =>
-        {
-            var lines = f.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Where(l => !l.Contains("-->")).Select(l => l.Replace("<v ", "").Replace("</v>", "").Replace(">", ": ")).ToList();
-            return string.Join(Environment.NewLine, lines);
-        }).ToList();
+        return fileContent
+            .Split(
+                new[] { $"{Environment.NewLine}{Environment.NewLine}" },
+                StringSplitOptions.RemoveEmptyEntries
+            )
+            .Select(f =>
+            {
+                var lines = f.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(l => !l.Contains("-->"))
+                    .Select(l => l.Replace("<v ", "").Replace("</v>", "").Replace(">", ": "))
+                    .ToList();
+                return string.Join(Environment.NewLine, lines);
+            })
+            .ToList();
     }
 
     public static string RemoveSpecialCharacters(this string name)

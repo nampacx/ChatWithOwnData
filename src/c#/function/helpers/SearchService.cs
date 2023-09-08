@@ -21,7 +21,10 @@ public class SearchService
     {
         this.searchEndpoint = searchEndpoint;
         this.searchKey = searchKey;
-        searchIndexClient = new SearchIndexClient(new Uri(searchEndpoint), new AzureKeyCredential(searchKey));
+        searchIndexClient = new SearchIndexClient(
+            new Uri(searchEndpoint),
+            new AzureKeyCredential(searchKey)
+        );
 
         var searchClientOptions = new RestClientOptions(searchEndpoint);
         searchRestClient = new RestClient(searchClientOptions);
@@ -29,7 +32,9 @@ public class SearchService
 
     public async Task UpdateIndexAsync(string indexName, ILogger log, List<Transcript> transcripts)
     {
-        var batch = IndexDocumentsBatch.Create(transcripts.Select(t => IndexDocumentsAction.Upload(t)).ToArray());
+        var batch = IndexDocumentsBatch.Create(
+            transcripts.Select(t => IndexDocumentsAction.Upload(t)).ToArray()
+        );
         try
         {
             var searchClient = searchIndexClient.GetSearchClient(indexName);
@@ -37,7 +42,9 @@ public class SearchService
 
             if (!result.Value.Results.All(r => r.Succeeded))
             {
-                log.LogError($"Failed to index some of the documents: {string.Join(", ", result.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key))}");
+                log.LogError(
+                    $"Failed to index some of the documents: {string.Join(", ", result.Value.Results.Where(r => !r.Succeeded).Select(r => r.Key))}"
+                );
             }
             else
             {
@@ -46,26 +53,45 @@ public class SearchService
         }
         catch (Exception e)
         {
-
             log.LogCritical($"{e.Message}");
         }
     }
 
-    public async Task<List<SearchResult>> SearchAsync(IReadOnlyList<float> queryVectors, int k, string indexName)
+    public async Task<List<SearchResult>> SearchAsync(
+        IReadOnlyList<float> queryVectors,
+        int k,
+        string indexName
+    )
     {
-        var requestBody = new { vectors = new[] { new { value = queryVectors, fields = $"{nameof(Transcript.content_vector)}", k } }, select = "content,origin" };
+        var requestBody = new
+        {
+            vectors = new[]
+            {
+                new
+                {
+                    value = queryVectors,
+                    fields = $"{nameof(Transcript.content_vector)}",
+                    k
+                }
+            },
+            select = "content,origin"
+        };
 
         var request = GetSearchRestRequest(indexName);
         request.AddJsonBody(requestBody);
         RestResponse response = await searchRestClient.ExecuteAsync(request);
         var searchResult = JsonConvert.DeserializeObject<SearchResults>(response.Content);
 
-        return searchResult.value;;
+        return searchResult.value;
+        ;
     }
 
     public RestRequest GetSearchRestRequest(string indexName)
     {
-        var request = new RestRequest($"/indexes/{indexName}/docs/search?api-version=2023-07-01-Preview", Method.Post);
+        var request = new RestRequest(
+            $"/indexes/{indexName}/docs/search?api-version=2023-07-01-Preview",
+            Method.Post
+        );
         request.AddHeader("Content-Type", "application/json");
         request.AddHeader("api-key", $"{searchKey}");
         return request;

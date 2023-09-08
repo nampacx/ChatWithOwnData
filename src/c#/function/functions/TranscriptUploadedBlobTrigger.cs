@@ -27,44 +27,53 @@ namespace Company.Function.functions
         private readonly SearchService searchService;
         private readonly LLMAccess llmAccess;
 
-        public TranscriptUploadedBlobTrigger(IndexBuilder indexBuilder, SearchService searchService, LLMAccess llmAccess)
+        public TranscriptUploadedBlobTrigger(
+            IndexBuilder indexBuilder,
+            SearchService searchService,
+            LLMAccess llmAccess
+        )
         {
             this.indexBuilder = indexBuilder;
             this.searchService = searchService;
             this.llmAccess = llmAccess;
         }
 
-
         [FunctionName("TranscriptUploadedBlobTrigger")]
-        public async Task Run([BlobTrigger("transcripts/{name}", Connection = "AzureWebJobsStorage")] Stream myBlob, string name, ILogger log)
+        public async Task Run(
+            [BlobTrigger("transcripts/{name}", Connection = "AzureWebJobsStorage")] Stream myBlob,
+            string name,
+            ILogger log
+        )
         {
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
+            log.LogInformation(
+                $"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes"
+            );
 
             var fileContent = myBlob.StreamToString();
             var fileExtension = Path.GetExtension(name);
 
             var indexName = Path.GetDirectoryName(name);
 
-              if(await indexBuilder.IndexExistsAsync(indexName))
-                {
-                    log.LogInformation($"Index {indexName} already exists");
-                }
-                else
-                {
-                    var index = IndexBuilder.BuildIndex(indexName);
-                    await indexBuilder.CreateIndexAsync(index);
-                    log.LogInformation($"Created index {indexName}");
-                }
+            if (await indexBuilder.IndexExistsAsync(indexName))
+            {
+                log.LogInformation($"Index {indexName} already exists");
+            }
+            else
+            {
+                var index = IndexBuilder.BuildIndex(indexName);
+                await indexBuilder.CreateIndexAsync(index);
+                log.LogInformation($"Created index {indexName}");
+            }
 
             List<string> lines = null;
             if (fileExtension == ".txt")
             {
-                lines =fileContent.ParseTXT();
+                lines = fileContent.ParseTXT();
                 log.LogInformation($"Parsed {lines.Count} lines from TXT file");
             }
             else if (fileExtension == ".vtt")
             {
-                lines =fileContent.ParseVTT();
+                lines = fileContent.ParseVTT();
                 log.LogInformation($"Parsed {lines.Count} lines from VTT file");
             }
             else
@@ -95,11 +104,14 @@ namespace Company.Function.functions
             return chunks;
         }
 
-    
-        private async Task<List<Transcript>> GetTranscriptsWithEmbedding(string name, List<string> chunks, ILogger log = null)
+        private async Task<List<Transcript>> GetTranscriptsWithEmbedding(
+            string name,
+            List<string> chunks,
+            ILogger log = null
+        )
         {
             var transcripts = new List<Transcript>();
-            var id =name.RemoveSpecialCharacters();
+            var id = name.RemoveSpecialCharacters();
             for (var i = 0; i < chunks.Count; i++)
             {
                 var embeddings = await llmAccess.GetEmbeddingsAsync(chunks[i]);
@@ -117,6 +129,6 @@ namespace Company.Function.functions
             }
 
             return transcripts;
-        }      
+        }
     }
 }
