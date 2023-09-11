@@ -7,8 +7,12 @@ using Azure.AI.OpenAI;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Identity.Client;
 
+/// <summary>
+/// Provides access to OpenAI's GPT-3 language model for generating responses to questions based on past meeting transcripts and chat history.
+/// </summary>
 public class LLMAccess
 {
+    // This line describes the behavior of the AI assistant. Feel free to change it to whatever you like.
      private const string SystemDescription =
          "You are an AI meeting minutes assistant that helps people find information in past meeting transcripts shared with you below. When answering questions try to mention the person who said what you are referring to as well as the meeting it was said in.";
 

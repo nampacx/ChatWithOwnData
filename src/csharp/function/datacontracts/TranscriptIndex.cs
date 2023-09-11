@@ -35,7 +35,7 @@ public class HnswParameters
     public int efSearch { get; set; }
 }
 
-public class TranscriptIndex
+public class IndexDefinition
 {
     public string name { get; set; }
     public List<Field> fields { get; set; }

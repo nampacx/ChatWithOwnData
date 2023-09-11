@@ -8,6 +8,11 @@ using Azure.Storage.Blobs.Models;
 
 static class ExtensionMethods
 {
+    /// <summary>
+    /// Parses a string containing text file content into a list of strings, where each string represents a line of the file.
+    /// </summary>
+    /// <param name="fileContent">The string containing the file content to parse.</param>
+    /// <returns>A list of strings, where each string represents a line of the file.</returns>
     public static List<string> ParseTXT(this string fileContent)
     {
         return fileContent
@@ -15,6 +20,11 @@ static class ExtensionMethods
             .ToList();
     }
 
+    /// <summary>
+    /// Parses a string containing WebVTT file content into a list of strings, where each string represents a caption block of the file.
+    /// </summary>
+    /// <param name="fileContent">The string containing the file content to parse.</param>
+    /// <returns>A list of strings, where each string represents a caption block of the file.</returns>
     public static List<string> ParseVTT(this string fileContent)
     {
         return fileContent
@@ -33,6 +43,11 @@ static class ExtensionMethods
             .ToList();
     }
 
+    /// <summary>
+    /// Removes any special characters from the file name and returns the resulting string.
+    /// </summary>
+    /// <param name="name">The file name to remove special characters from.</param>
+    /// <returns>The file name with any special characters removed.</returns>
     public static string RemoveSpecialCharacters(this string name)
     {
         var pattern = "[^a-zA-Z0-9]+";
@@ -41,6 +56,11 @@ static class ExtensionMethods
         return output;
     }
 
+    /// <summary>
+    /// Converts a stream to a string.
+    /// </summary>
+    /// <param name="stream">The stream to convert to a string.</param>
+    /// <returns>The string representation of the stream.</returns>
     public static string StreamToString(this Stream stream)
     {
         stream.Position = 0;

@@ -14,6 +14,10 @@ using RestSharp;
 
 [assembly: FunctionsStartup(typeof(Company.Function.Startup))]
 
+/// <summary>
+/// This class represents the startup configuration for the Azure Functions app.
+/// It configures the dependency injection container with the necessary services.
+/// </summary>
 namespace Company.Function
 {
     public class Startup : FunctionsStartup

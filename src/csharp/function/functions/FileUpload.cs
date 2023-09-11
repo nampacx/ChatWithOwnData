@@ -10,6 +10,9 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Company.Function
 {
+    /// <summary>
+    /// Represents a file upload function that uploads a file to a specified directory in a cloud blob container.
+    /// </summary>
     public class FileUpload
     {
         private readonly CloudBlobContainer containerClient;
@@ -19,6 +22,12 @@ namespace Company.Function
             this.containerClient = containerClient;
         }
 
+        /// <summary>
+        /// Uploads a file to a specified directory in a cloud blob container.
+        /// </summary>
+        /// <param name="req">The HTTP request.</param>
+        /// <param name="log">The logger.</param>
+        /// <returns>An IActionResult representing the result of the upload operation.</returns>
         [FunctionName("FileUpload")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,

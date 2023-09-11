@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Azure.Search.Documents.Indexes;
 
-public class Transcript
+public class IndexObject
 {
     [SearchableField(IsKey = true)]
     public string id { get; set; }

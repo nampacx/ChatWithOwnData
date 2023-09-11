@@ -20,9 +20,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Company.Function.functions
 {
+    /// <summary>
+    /// Blob trigger function that is triggered when a new transcript is uploaded to the "transcripts" container in Azure Blob Storage.
+    /// </summary>
     public class TranscriptUploadedBlobTrigger
     {
-        private const int MaxChunkSize = 3;
         private readonly IndexBuilder indexBuilder;
         private readonly SearchService searchService;
         private readonly LLMAccess llmAccess;
@@ -38,6 +40,12 @@ namespace Company.Function.functions
             this.llmAccess = llmAccess;
         }
 
+        /// <summary>
+        /// Method that is called when a new transcript is uploaded to the "transcripts" container in Azure Blob Storage.
+        /// </summary>
+        /// <param name="myBlob">The uploaded transcript blob.</param>
+        /// <param name="name">The name of the uploaded transcript blob.</param>
+        /// <param name="log">The logger instance.</param>
         [FunctionName("TranscriptUploadedBlobTrigger")]
         public async Task Run(
             [BlobTrigger("transcripts/{name}", Connection = "AzureWebJobsStorage")] Stream myBlob,
@@ -46,7 +54,7 @@ namespace Company.Function.functions
         )
         {
             log.LogInformation(
-                $"csharp Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes"
+                $"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes"
             );
 
             var fileContent = myBlob.StreamToString();
@@ -65,60 +73,42 @@ namespace Company.Function.functions
                 log.LogInformation($"Created index {indexName}");
             }
 
-            List<string> lines = null;
-            if (fileExtension == ".txt")
-            {
-                lines = fileContent.ParseTXT();
-                log.LogInformation($"Parsed {lines.Count} lines from TXT file");
-            }
-            else if (fileExtension == ".vtt")
-            {
-                lines = fileContent.ParseVTT();
-                log.LogInformation($"Parsed {lines.Count} lines from VTT file");
-            }
-            else
-            {
-                log.LogInformation("File extension not supported");
-                return;
-            }
-
-            var chunks = CreateChunks(lines);
+            // This line is usecase specific. It splits the file into chunks of 3 lines each.
+            // If you want to use this code for your own usecase, you will have to change this line.
+            var chunks = Chunker.GetChunks(fileContent, fileExtension, log);
 
             log.LogInformation($"Created {chunks.Count} chunks");
 
-            List<Transcript> transcripts = await GetTranscriptsWithEmbedding(name, chunks, log);
+            List<IndexObject> transcripts = await GetIndexObjectWithVectorAsync(llmAccess, name, chunks, log);
             log.LogInformation($"Created {transcripts.Count} transcripts");
             await searchService.UpdateIndexAsync(indexName, log, transcripts);
 
             log.LogInformation("Trigger finished!");
         }
 
-        private static List<string> CreateChunks(List<string> lines)
-        {
-            var chunks = new List<string>();
-            for (var i = 0; i < lines.Count; i++)
-            {
-                chunks.Add(string.Join(Environment.NewLine, lines.Skip(i).Take(MaxChunkSize)));
-            }
-
-            return chunks;
-        }
-
-        private async Task<List<Transcript>> GetTranscriptsWithEmbedding(
+        /// <summary>
+        /// Method that creates a list of IndexObjects with content and content vectors for each chunk of the uploaded transcript.
+        /// </summary>
+        /// <param name="name">The name of the uploaded transcript blob.</param>
+        /// <param name="content">The content of the uploaded transcript blob.</param>
+        /// <param name="log">The logger instance.</param>
+        /// <returns>A list of IndexObjects with content and content vectors for each chunk of the uploaded transcript.</returns>
+        private static async Task<List<IndexObject>> GetIndexObjectWithVectorAsync(
+            LLMAccess llmAccess,
             string name,
-            List<string> chunks,
+            List<string> content,
             ILogger log = null
         )
         {
-            var transcripts = new List<Transcript>();
+            var transcripts = new List<IndexObject>();
             var id = name.RemoveSpecialCharacters();
-            for (var i = 0; i < chunks.Count; i++)
+            for (var i = 0; i < content.Count; i++)
             {
-                var embeddings = await llmAccess.GetEmbeddingsAsync(chunks[i]);
+                var embeddings = await llmAccess.GetEmbeddingsAsync(content[i]);
 
-                var transcript = new Transcript()
+                var transcript = new IndexObject()
                 {
-                    content = chunks[i],
+                    content = content[i],
                     content_vector = embeddings.ToList(),
                     origin = id,
                     id = $"f-{id}-{i}"

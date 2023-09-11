@@ -12,17 +12,31 @@ using System.Linq;
 
 namespace Company.Function
 {
+    /// <summary>
+    /// Represents a class that handles HTTP requests to ask a question and get an answer.
+    /// </summary>
     public class Ask
     {
         private readonly LLMAccess llmAccess;
         private readonly SearchService searchService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Ask"/> class.
+        /// </summary>
+        /// <param name="llmAccess">The LLM access.</param>
+        /// <param name="searchService">The search service.</param>
         public Ask(LLMAccess llmAccess, SearchService searchService)
         {
             this.llmAccess = llmAccess;
             this.searchService = searchService;
         }
 
+        /// <summary>
+        /// Handles the HTTP request to ask a question and get an answer.
+        /// </summary>
+        /// <param name="req">The HTTP request.</param>
+        /// <param name="log">The logger.</param>
+        /// <returns>The HTTP response.</returns>
         [FunctionName("Ask")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,

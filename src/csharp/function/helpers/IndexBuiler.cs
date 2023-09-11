@@ -4,6 +4,9 @@ using Azure.Search.Documents.Indexes.Models;
 using Newtonsoft.Json;
 using RestSharp;
 
+/// <summary>
+/// Represents a builder for creating and managing Azure Search indexes.
+/// </summary>
 public class IndexBuilder
 {
     private const string Resource = "/indexes?api-version=2023-07-01-Preview";
@@ -17,9 +20,9 @@ public class IndexBuilder
         this.key = key;
     }
 
-    public static TranscriptIndex BuildIndex(string name)
+    public static IndexDefinition BuildIndex(string name)
     {
-        var transcript = new TranscriptIndex()
+        var transcript = new IndexDefinition()
         {
             name = name,
             similarity = new Similarity() { odatatype = "#Microsoft.Azure.Search.BM25Similarity" },
@@ -80,7 +83,7 @@ public class IndexBuilder
         return transcript;
     }
 
-    public async Task CreateIndexAsync(TranscriptIndex index)
+    public async Task CreateIndexAsync(IndexDefinition index)
     {
         var str = JsonConvert.SerializeObject(index);
 
